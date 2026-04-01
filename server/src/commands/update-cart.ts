@@ -16,14 +16,12 @@ type UpdateCartInput = {
   removePromoCode?: string
 }
 
-export const updateCart = (input: UpdateCartInput): Cart => {
-  // Acceptance: existing cart is available
-  const cart = store.carts.get(input.id)
+export const updateCart = async (input: UpdateCartInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
 
-  // Update only changed fields
   if (input.regionId !== undefined) cart.regionId = input.regionId
   if (input.customerId !== undefined) cart.customerId = input.customerId
   if (input.salesChannelId !== undefined) cart.salesChannelId = input.salesChannelId
@@ -32,9 +30,8 @@ export const updateCart = (input: UpdateCartInput): Cart => {
   if (input.shippingAddress !== undefined) cart.shippingAddress = input.shippingAddress
   if (input.billingAddress !== undefined) cart.billingAddress = input.billingAddress
 
-  // Handle promo code application
   if (input.promoCode) {
-    const promo = store.promoCodes.get(input.promoCode)
+    const promo = await store.promoCodes.get(input.promoCode)
     if (!promo) {
       throw new Error(`Promo code "${input.promoCode}" not found`)
     }
@@ -49,9 +46,9 @@ export const updateCart = (input: UpdateCartInput): Cart => {
     )
   }
 
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_UPDATED, cart)
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

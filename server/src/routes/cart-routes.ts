@@ -21,60 +21,55 @@ import { store } from "../store/store.js"
 
 export const cartRouter = Router()
 
-// Products endpoint (needed for catalog UI)
-cartRouter.get("/products", (_req, res) => {
-  res.json(store.products.getAll())
+cartRouter.get("/products", async (_req, res) => {
+  const products = await store.products.getAll()
+  res.json(products)
 })
 
-// Shipping options list
-cartRouter.get("/shipping-options", (_req, res) => {
-  res.json(store.shippingOptions.getAll())
+cartRouter.get("/shipping-options", async (_req, res) => {
+  const options = await store.shippingOptions.getAll()
+  res.json(options)
 })
 
-// POST /api/carts → CreateCart
-cartRouter.post("/carts", (req, res) => {
+cartRouter.post("/carts", async (req, res) => {
   try {
-    const cart = createCart(req.body)
+    const cart = await createCart(req.body)
     res.status(201).json(cart)
   } catch (e: any) {
     res.status(400).json({ error: e.message })
   }
 })
 
-// GET /api/carts/:id → GetCartDetails
-cartRouter.get("/carts/:id", (req, res) => {
+cartRouter.get("/carts/:id", async (req, res) => {
   try {
-    const cart = getCartDetails(req.params.id)
+    const cart = await getCartDetails(req.params.id)
     res.json(cart)
   } catch (e: any) {
     res.status(404).json({ error: e.message })
   }
 })
 
-// PUT /api/carts/:id → UpdateCart
-cartRouter.put("/carts/:id", (req, res) => {
+cartRouter.put("/carts/:id", async (req, res) => {
   try {
-    const cart = updateCart({ id: req.params.id, ...req.body })
+    const cart = await updateCart({ id: req.params.id, ...req.body })
     res.json(cart)
   } catch (e: any) {
     res.status(400).json({ error: e.message })
   }
 })
 
-// POST /api/carts/:id/items → AddCartItem
-cartRouter.post("/carts/:id/items", (req, res) => {
+cartRouter.post("/carts/:id/items", async (req, res) => {
   try {
-    const cart = addCartItem({ id: req.params.id, lineItem: req.body })
+    const cart = await addCartItem({ id: req.params.id, lineItem: req.body })
     res.status(201).json(cart)
   } catch (e: any) {
     res.status(400).json({ error: e.message })
   }
 })
 
-// PUT /api/carts/:id/items/:itemId → UpdateCartItem
-cartRouter.put("/carts/:id/items/:itemId", (req, res) => {
+cartRouter.put("/carts/:id/items/:itemId", async (req, res) => {
   try {
-    const cart = updateCartItem({
+    const cart = await updateCartItem({
       id: req.params.id,
       lineItemId: req.params.itemId,
       ...req.body,
@@ -85,10 +80,9 @@ cartRouter.put("/carts/:id/items/:itemId", (req, res) => {
   }
 })
 
-// DELETE /api/carts/:id/items/:itemId → RemoveCartItem
-cartRouter.delete("/carts/:id/items/:itemId", (req, res) => {
+cartRouter.delete("/carts/:id/items/:itemId", async (req, res) => {
   try {
-    const cart = removeCartItem({
+    const cart = await removeCartItem({
       id: req.params.id,
       lineItemId: req.params.itemId,
     })
@@ -98,10 +92,9 @@ cartRouter.delete("/carts/:id/items/:itemId", (req, res) => {
   }
 })
 
-// POST /api/carts/:id/shipping-methods → AddShippingMethod
-cartRouter.post("/carts/:id/shipping-methods", (req, res) => {
+cartRouter.post("/carts/:id/shipping-methods", async (req, res) => {
   try {
-    const cart = addShippingMethod({
+    const cart = await addShippingMethod({
       id: req.params.id,
       shippingMethod: req.body,
     })
@@ -111,10 +104,9 @@ cartRouter.post("/carts/:id/shipping-methods", (req, res) => {
   }
 })
 
-// DELETE /api/carts/:id/shipping-methods/:methodId → RemoveShippingMethod
-cartRouter.delete("/carts/:id/shipping-methods/:methodId", (req, res) => {
+cartRouter.delete("/carts/:id/shipping-methods/:methodId", async (req, res) => {
   try {
-    const cart = removeShippingMethod({
+    const cart = await removeShippingMethod({
       id: req.params.id,
       shippingMethodId: req.params.methodId,
     })
@@ -124,10 +116,9 @@ cartRouter.delete("/carts/:id/shipping-methods/:methodId", (req, res) => {
   }
 })
 
-// POST /api/carts/:id/credit-lines → AddCreditLine
-cartRouter.post("/carts/:id/credit-lines", (req, res) => {
+cartRouter.post("/carts/:id/credit-lines", async (req, res) => {
   try {
-    const cart = addCreditLine({
+    const cart = await addCreditLine({
       id: req.params.id,
       creditLine: req.body,
     })
@@ -137,10 +128,9 @@ cartRouter.post("/carts/:id/credit-lines", (req, res) => {
   }
 })
 
-// DELETE /api/carts/:id/credit-lines/:creditLineId → RemoveCreditLine
-cartRouter.delete("/carts/:id/credit-lines/:creditLineId", (req, res) => {
+cartRouter.delete("/carts/:id/credit-lines/:creditLineId", async (req, res) => {
   try {
-    const cart = removeCreditLine({
+    const cart = await removeCreditLine({
       id: req.params.id,
       creditLineId: req.params.creditLineId,
     })
@@ -150,40 +140,36 @@ cartRouter.delete("/carts/:id/credit-lines/:creditLineId", (req, res) => {
   }
 })
 
-// POST /api/carts/:id/complete → CompleteCart
-cartRouter.post("/carts/:id/complete", (req, res) => {
+cartRouter.post("/carts/:id/complete", async (req, res) => {
   try {
-    const cart = completeCart({ id: req.params.id })
+    const cart = await completeCart({ id: req.params.id })
     res.json(cart)
   } catch (e: any) {
     res.status(400).json({ error: e.message })
   }
 })
 
-// GET /api/carts/:id/shipping-options → GetCartShippingOptions
-cartRouter.get("/carts/:id/shipping-options", (req, res) => {
+cartRouter.get("/carts/:id/shipping-options", async (req, res) => {
   try {
-    const options = getCartShippingOptions(req.params.id)
+    const options = await getCartShippingOptions(req.params.id)
     res.json(options)
   } catch (e: any) {
     res.status(404).json({ error: e.message })
   }
 })
 
-// GET /api/carts/:id/credit-options → GetCartCreditOptions
-cartRouter.get("/carts/:id/credit-options", (req, res) => {
+cartRouter.get("/carts/:id/credit-options", async (req, res) => {
   try {
-    const options = getCartCreditOptions(req.params.id)
+    const options = await getCartCreditOptions(req.params.id)
     res.json(options)
   } catch (e: any) {
     res.status(404).json({ error: e.message })
   }
 })
 
-// GET /api/carts/:id/checkout-summary → GetCheckoutSummary
-cartRouter.get("/carts/:id/checkout-summary", (req, res) => {
+cartRouter.get("/carts/:id/checkout-summary", async (req, res) => {
   try {
-    const summary = getCheckoutSummary(req.params.id)
+    const summary = await getCheckoutSummary(req.params.id)
     res.json(summary)
   } catch (e: any) {
     res.status(404).json({ error: e.message })

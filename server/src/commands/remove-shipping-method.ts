@@ -8,9 +8,8 @@ type RemoveShippingMethodInput = {
   shippingMethodId: string
 }
 
-export const removeShippingMethod = (input: RemoveShippingMethodInput): Cart => {
-  // Acceptance: existing cart that contains a shipping method
-  const cart = store.carts.get(input.id)
+export const removeShippingMethod = async (input: RemoveShippingMethodInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -23,9 +22,9 @@ export const removeShippingMethod = (input: RemoveShippingMethodInput): Cart => 
   }
 
   const [removed] = cart.shippingMethods.splice(idx, 1)
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_SHIPPING_METHOD_REMOVED, { cart, method: removed })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

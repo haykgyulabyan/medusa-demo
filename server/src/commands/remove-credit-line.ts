@@ -8,9 +8,8 @@ type RemoveCreditLineInput = {
   creditLineId: string
 }
 
-export const removeCreditLine = (input: RemoveCreditLineInput): Cart => {
-  // Acceptance: existing cart that contains a credit line
-  const cart = store.carts.get(input.id)
+export const removeCreditLine = async (input: RemoveCreditLineInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -23,9 +22,9 @@ export const removeCreditLine = (input: RemoveCreditLineInput): Cart => {
   }
 
   const [removed] = cart.creditLines.splice(idx, 1)
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_CREDIT_LINE_REMOVED, { cart, creditLine: removed })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

@@ -13,15 +13,14 @@ type AddShippingMethodInput = {
   }
 }
 
-export const addShippingMethod = (input: AddShippingMethodInput): Cart => {
-  // Acceptance: existing cart and available shipping option
-  const cart = store.carts.get(input.id)
+export const addShippingMethod = async (input: AddShippingMethodInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
 
   if (input.shippingMethod.shippingOptionId) {
-    const option = store.shippingOptions.get(input.shippingMethod.shippingOptionId)
+    const option = await store.shippingOptions.get(input.shippingMethod.shippingOptionId)
     if (!option) {
       throw new Error(`Shipping option ${input.shippingMethod.shippingOptionId} not found`)
     }
@@ -40,11 +39,10 @@ export const addShippingMethod = (input: AddShippingMethodInput): Cart => {
     total: 0,
   }
 
-  // Replace existing shipping methods (one at a time)
   cart.shippingMethods = [method]
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_SHIPPING_METHOD_ADDED, { cart, method })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

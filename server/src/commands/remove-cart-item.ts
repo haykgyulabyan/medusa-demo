@@ -8,9 +8,8 @@ type RemoveCartItemInput = {
   lineItemId: string
 }
 
-export const removeCartItem = (input: RemoveCartItemInput): Cart => {
-  // Acceptance: existing cart that contains a specific line item
-  const cart = store.carts.get(input.id)
+export const removeCartItem = async (input: RemoveCartItemInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -21,9 +20,9 @@ export const removeCartItem = (input: RemoveCartItemInput): Cart => {
   }
 
   const [removed] = cart.items.splice(idx, 1)
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_ITEM_REMOVED, { cart, item: removed })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

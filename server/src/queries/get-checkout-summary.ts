@@ -1,7 +1,7 @@
 import { store } from "../store/store.js"
 
-export const getCheckoutSummary = (cartId: string) => {
-  const cart = store.carts.get(cartId)
+export const getCheckoutSummary = async (cartId: string) => {
+  const cart = await store.carts.get(cartId)
   if (!cart) {
     throw new Error(`Cart ${cartId} not found`)
   }

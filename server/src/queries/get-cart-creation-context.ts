@@ -1,8 +1,9 @@
 import { store } from "../store/store.js"
 
-export const getCartCreationContext = () => {
+export const getCartCreationContext = async () => {
+  const regions = await store.regions.getAll()
   return {
-    regions: store.regions.getAll(),
-    currencies: store.regions.getAll().map((r) => r.currencyCode),
+    regions,
+    currencies: regions.map((r) => r.currencyCode),
   }
 }

@@ -11,9 +11,8 @@ type UpdateCartItemInput = {
   unitPrice?: number
 }
 
-export const updateCartItem = (input: UpdateCartItemInput): Cart => {
-  // Acceptance: existing cart that already contains a line item
-  const cart = store.carts.get(input.id)
+export const updateCartItem = async (input: UpdateCartItemInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -23,7 +22,6 @@ export const updateCartItem = (input: UpdateCartItemInput): Cart => {
     throw new Error(`Line item ${input.lineItemId} not found in cart ${input.id}`)
   }
 
-  // Update changed fields
   if (input.quantity !== undefined) {
     if (input.quantity <= 0) {
       throw new Error("Quantity must be greater than zero")
@@ -33,9 +31,9 @@ export const updateCartItem = (input: UpdateCartItemInput): Cart => {
   if (input.isCustomPrice !== undefined) item.isCustomPrice = input.isCustomPrice
   if (input.unitPrice !== undefined) item.unitPrice = input.unitPrice
 
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_ITEM_UPDATED, { cart, item })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

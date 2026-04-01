@@ -19,19 +19,16 @@ type AddCartItemInput = {
   }
 }
 
-export const addCartItem = (input: AddCartItemInput): Cart => {
-  // Acceptance: existing cart
-  const cart = store.carts.get(input.id)
+export const addCartItem = async (input: AddCartItemInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
 
-  // Acceptance: quantity greater than zero
   if (!input.lineItem.quantity || input.lineItem.quantity <= 0) {
     throw new Error("Line item quantity must be greater than zero")
   }
 
-  // Acceptance: valid item snapshot
   if (!input.lineItem.title || input.lineItem.unitPrice === undefined) {
     throw new Error("Line item must have a title and unitPrice")
   }
@@ -57,9 +54,9 @@ export const addCartItem = (input: AddCartItemInput): Cart => {
   }
 
   cart.items.push(item)
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_ITEM_ADDED, { cart, item })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

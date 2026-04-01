@@ -12,9 +12,8 @@ type AddCreditLineInput = {
   }
 }
 
-export const addCreditLine = (input: AddCreditLineInput): Cart => {
-  // Acceptance: existing cart and valid credit source or amount
-  const cart = store.carts.get(input.id)
+export const addCreditLine = async (input: AddCreditLineInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -31,9 +30,9 @@ export const addCreditLine = (input: AddCreditLineInput): Cart => {
   }
 
   cart.creditLines.push(creditLine)
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_CREDIT_LINE_ADDED, { cart, creditLine })
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

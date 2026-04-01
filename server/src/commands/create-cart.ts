@@ -14,8 +14,7 @@ type CreateCartInput = {
   billingAddress?: Address
 }
 
-export const createCart = (input: CreateCartInput): Cart => {
-  // Acceptance: customer has selected a currency
+export const createCart = async (input: CreateCartInput): Promise<Cart> => {
   if (!input.currencyCode) {
     throw new Error("currencyCode is required to create a cart")
   }
@@ -43,9 +42,9 @@ export const createCart = (input: CreateCartInput): Cart => {
     total: 0,
   }
 
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_CREATED, cart)
-  recalculateCartPricing(cart.id)
+  await recalculateCartPricing(cart.id)
 
-  return store.carts.get(cart.id)!
+  return (await store.carts.get(cart.id))!
 }

@@ -1,40 +1,93 @@
 import type { Cart, Product, ShippingOption, PromoCode, TaxRate, Region } from "../domain/types.js"
-
-const carts = new Map<string, Cart>()
-const products: Product[] = []
-const shippingOptions: ShippingOption[] = []
-const promoCodes: PromoCode[] = []
-const taxRates: TaxRate[] = []
-const regions: Region[] = []
+import { supabase } from "./supabase-client.js"
 
 export const store = {
   carts: {
-    get: (id: string) => carts.get(id),
-    set: (id: string, cart: Cart) => { carts.set(id, cart) },
-    has: (id: string) => carts.has(id),
+    async get(id: string): Promise<Cart | undefined> {
+      const { data } = await supabase
+        .from("carts")
+        .select("data")
+        .eq("id", id)
+        .single()
+      return data?.data as Cart | undefined
+    },
+
+    async set(id: string, cart: Cart): Promise<void> {
+      await supabase.from("carts").upsert({ id, data: cart })
+    },
   },
+
   products: {
-    getAll: () => products,
-    getByVariantId: (variantId: string) => products.find((p) => p.variantId === variantId),
-    getById: (id: string) => products.find((p) => p.id === id),
-    seed: (items: Product[]) => { products.push(...items) },
+    async getAll(): Promise<Product[]> {
+      const { data } = await supabase.from("products").select("*")
+      return (data ?? []).map((p) => ({
+        id: p.id,
+        title: p.title,
+        variantId: p.variant_id,
+        unitPrice: p.unit_price,
+        requiresShipping: p.requires_shipping,
+      }))
+    },
+
+    async getByVariantId(variantId: string): Promise<Product | undefined> {
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("variant_id", variantId)
+        .single()
+      if (!data) return undefined
+      return {
+        id: data.id,
+        title: data.title,
+        variantId: data.variant_id,
+        unitPrice: data.unit_price,
+        requiresShipping: data.requires_shipping,
+      }
+    },
   },
+
   shippingOptions: {
-    getAll: () => shippingOptions,
-    get: (id: string) => shippingOptions.find((o) => o.id === id),
-    seed: (items: ShippingOption[]) => { shippingOptions.push(...items) },
+    async getAll(): Promise<ShippingOption[]> {
+      const { data } = await supabase.from("shipping_options").select("*")
+      return (data ?? []) as ShippingOption[]
+    },
+
+    async get(id: string): Promise<ShippingOption | undefined> {
+      const { data } = await supabase
+        .from("shipping_options")
+        .select("*")
+        .eq("id", id)
+        .single()
+      return data as ShippingOption | undefined
+    },
   },
+
   promoCodes: {
-    get: (code: string) => promoCodes.find((p) => p.code === code),
-    seed: (items: PromoCode[]) => { promoCodes.push(...items) },
+    async get(code: string): Promise<PromoCode | undefined> {
+      const { data } = await supabase
+        .from("promo_codes")
+        .select("*")
+        .eq("code", code)
+        .single()
+      return data as PromoCode | undefined
+    },
   },
+
   taxRates: {
-    getAll: () => taxRates,
-    seed: (items: TaxRate[]) => { taxRates.push(...items) },
+    async getAll(): Promise<TaxRate[]> {
+      const { data } = await supabase.from("tax_rates").select("*")
+      return (data ?? []) as TaxRate[]
+    },
   },
+
   regions: {
-    get: (id: string) => regions.find((r) => r.id === id),
-    getAll: () => regions,
-    seed: (items: Region[]) => { regions.push(...items) },
+    async getAll(): Promise<Region[]> {
+      const { data } = await supabase.from("regions").select("*")
+      return (data ?? []).map((r) => ({
+        id: r.id,
+        name: r.name,
+        currencyCode: r.currency_code,
+      }))
+    },
   },
 }

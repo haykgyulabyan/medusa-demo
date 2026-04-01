@@ -6,9 +6,8 @@ type CompleteCartInput = {
   id: string
 }
 
-export const completeCart = (input: CompleteCartInput): Cart => {
-  // Acceptance: existing cart with all required checkout information and current pricing
-  const cart = store.carts.get(input.id)
+export const completeCart = async (input: CompleteCartInput): Promise<Cart> => {
+  const cart = await store.carts.get(input.id)
   if (!cart) {
     throw new Error(`Cart ${input.id} not found`)
   }
@@ -29,10 +28,9 @@ export const completeCart = (input: CompleteCartInput): Cart => {
     throw new Error("Cart must have a shipping address to complete")
   }
 
-  // Mark as completed
   cart.completedAt = new Date().toISOString()
 
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_COMPLETED, cart)
 
   return cart

@@ -7,22 +7,22 @@ import type {
   ShippingMethodTaxLine,
 } from "../domain/types.js"
 
-export const recalculateCartPricing = (cartId: string): void => {
-  const cart = store.carts.get(cartId)
+export const recalculateCartPricing = async (cartId: string): Promise<void> => {
+  const cart = await store.carts.get(cartId)
   if (!cart) {
     throw new Error(`Cart ${cartId} not found`)
   }
 
-  const taxRates = store.taxRates.getAll()
-  const appliedPromos = cart.appliedPromoCodes
-    .map((code) => store.promoCodes.get(code))
-    .filter(Boolean)
+  const taxRates = await store.taxRates.getAll()
+  const appliedPromos = (
+    await Promise.all(
+      cart.appliedPromoCodes.map((code) => store.promoCodes.get(code))
+    )
+  ).filter(Boolean)
 
   const hasFreeShipping = appliedPromos.some((p) => p!.type === "free_shipping")
 
-  // Recalculate each line item
   for (const item of cart.items) {
-    // Rebuild adjustments from applied promo codes
     const adjustments: LineItemAdjustment[] = []
     if (item.isDiscountable) {
       for (const promo of appliedPromos) {
@@ -47,12 +47,10 @@ export const recalculateCartPricing = (cartId: string): void => {
             promotionId: promo.code,
           })
         }
-        // free_shipping promos don't affect line items
       }
     }
     item.adjustments = adjustments
 
-    // Rebuild tax lines
     const itemTaxLines: LineItemTaxLine[] = taxRates.map((tr) => ({
       id: crypto.randomUUID(),
       code: tr.code,
@@ -62,10 +60,8 @@ export const recalculateCartPricing = (cartId: string): void => {
     }))
     item.taxLines = itemTaxLines
 
-    // Compute item totals per CLAUDE.md formulas
     item.subtotal = item.unitPrice * item.quantity
     item.discountTotal = item.adjustments.reduce((sum, a) => sum + a.amount, 0)
-    // Don't discount more than the subtotal
     item.discountTotal = Math.min(item.discountTotal, item.subtotal)
     const taxableAmount = item.subtotal - item.discountTotal
     item.taxTotal = Math.round(
@@ -74,7 +70,6 @@ export const recalculateCartPricing = (cartId: string): void => {
     item.total = item.subtotal - item.discountTotal + item.taxTotal
   }
 
-  // Recalculate each shipping method
   for (const method of cart.shippingMethods) {
     const smAdjustments: ShippingMethodAdjustment[] = []
     if (hasFreeShipping) {
@@ -106,7 +101,6 @@ export const recalculateCartPricing = (cartId: string): void => {
     method.total = method.amount - method.discountTotal + method.taxTotal
   }
 
-  // Compute cart-level totals
   cart.subtotal = cart.items.reduce((sum, i) => sum + i.subtotal, 0)
   cart.itemTotal = cart.items.reduce((sum, i) => sum + i.total, 0)
   cart.discountTotal =
@@ -119,6 +113,6 @@ export const recalculateCartPricing = (cartId: string): void => {
   cart.creditLineTotal = cart.creditLines.reduce((sum, cl) => sum + cl.amount, 0)
   cart.total = cart.itemTotal + cart.shippingTotal - cart.creditLineTotal
 
-  store.carts.set(cart.id, cart)
+  await store.carts.set(cart.id, cart)
   eventBus.emit(DomainEvents.CART_PRICING_RECALCULATED, cart)
 }
