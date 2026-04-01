@@ -5,29 +5,8 @@ import { PromoCodeInput } from "../components/PromoCodeInput"
 import { formatCents } from "../components/format"
 import type { NavigateFunction } from "react-router-dom"
 
-type CartData = {
-  id: string
-  items: {
-    id: string
-    title: string
-    quantity: number
-    unitPrice: number
-    subtotal: number
-    discountTotal: number
-    taxTotal: number
-    total: number
-    adjustments: { code?: string }[]
-  }[]
-  appliedPromoCodes: string[]
-  subtotal: number
-  discountTotal: number
-  taxTotal: number
-  total: number
-  [key: string]: unknown
-}
-
 type Props = {
-  cart: CartData | null
+  cart: Record<string, any> | null
   refreshCart: () => Promise<unknown>
   navigate: NavigateFunction
 }
@@ -92,7 +71,7 @@ export const CartPage = ({ cart, refreshCart, navigate }: Props) => {
       <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          {cart.items.map((item) => (
+          {cart.items.map((item: any) => (
             <CartItem
               key={item.id}
               item={item}

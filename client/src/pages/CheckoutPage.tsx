@@ -34,13 +34,8 @@ type CheckoutSummary = {
   total: number
 }
 
-type CartData = {
-  id: string
-  [key: string]: unknown
-}
-
 type Props = {
-  cart: CartData | null
+  cart: Record<string, any> | null
   refreshCart: () => Promise<unknown>
   navigate: NavigateFunction
 }

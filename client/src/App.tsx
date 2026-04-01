@@ -7,15 +7,12 @@ import { CheckoutPage } from "./pages/CheckoutPage"
 import { ConfirmationPage } from "./pages/ConfirmationPage"
 import { api } from "./api/client"
 
-type Cart = {
-  id: string
-  items: { id: string }[]
-  [key: string]: unknown
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CartData = Record<string, any>
 
 export const App = () => {
   const [cartId, setCartId] = useState<string | null>(null)
-  const [cart, setCart] = useState<Cart | null>(null)
+  const [cart, setCart] = useState<CartData | null>(null)
   const navigate = useNavigate()
 
   const refreshCart = useCallback(async () => {

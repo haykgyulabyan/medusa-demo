@@ -1,21 +1,8 @@
 import { formatCents } from "../components/format"
 import type { NavigateFunction } from "react-router-dom"
 
-type CartData = {
-  id: string
-  completedAt?: string
-  items: { id: string; title: string; quantity: number; total: number }[]
-  shippingMethods: { name: string; total: number }[]
-  subtotal: number
-  discountTotal: number
-  shippingTotal: number
-  taxTotal: number
-  total: number
-  [key: string]: unknown
-}
-
 type Props = {
-  cart: CartData | null
+  cart: Record<string, any> | null
   navigate: NavigateFunction
 }
 
@@ -39,7 +26,7 @@ export const ConfirmationPage = ({ cart, navigate }: Props) => {
 
         <div className="text-left border-t pt-6 space-y-3">
           <h3 className="font-semibold">Items</h3>
-          {cart.items.map((item) => (
+          {cart.items.map((item: any) => (
             <div key={item.id} className="flex justify-between text-sm">
               <span>
                 {item.title} x{item.quantity}
@@ -48,7 +35,7 @@ export const ConfirmationPage = ({ cart, navigate }: Props) => {
             </div>
           ))}
 
-          {cart.shippingMethods.map((m, i) => (
+          {cart.shippingMethods.map((m: any, i: number) => (
             <div key={i} className="flex justify-between text-sm">
               <span className="text-gray-600">{m.name}</span>
               <span>{formatCents(m.total)}</span>
