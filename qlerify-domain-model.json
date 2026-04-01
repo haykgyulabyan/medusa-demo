@@ -1,7 +1,7 @@
 {
-  "$schema": "https://app.qlerify.com/schemas/domain-model/v1.json",
+  "$schema": "https://indoor.qlerify.com/schemas/domain-model/v1.json",
   "version": 1,
-  "boundedContext": "Medusa (improved-v2)",
+  "boundedContext": "Shopping Cart",
   "roles": [
     "Customer",
     "Automation"
@@ -869,9 +869,6 @@
             },
             "fields": [
               {
-                "name": "id"
-              },
-              {
                 "name": "firstName"
               },
               {
@@ -898,9 +895,6 @@
             },
             "fields": [
               {
-                "name": "id"
-              },
-              {
                 "name": "firstName"
               },
               {
@@ -925,6 +919,9 @@
           },
           {
             "name": "items",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/LineItem"
+            },
             "fields": [
               {
                 "name": "id"
@@ -976,6 +973,9 @@
           },
           {
             "name": "shippingMethods",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/ShippingMethod"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1030,6 +1030,9 @@
           },
           {
             "name": "creditLines",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/CreditLine"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1068,9 +1071,6 @@
             },
             "fields": [
               {
-                "name": "id"
-              },
-              {
                 "name": "countryCode"
               },
               {
@@ -1086,6 +1086,9 @@
           },
           {
             "name": "shippingMethods",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/ShippingMethod"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1122,6 +1125,9 @@
           },
           {
             "name": "creditLines",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/CreditLine"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1155,6 +1161,9 @@
           },
           {
             "name": "items",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/LineItem"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1177,9 +1186,6 @@
             },
             "fields": [
               {
-                "name": "id"
-              },
-              {
                 "name": "firstName"
               },
               {
@@ -1201,6 +1207,9 @@
           },
           {
             "name": "shippingMethods",
+            "relatedEntity": {
+              "$ref": "#/schemas/entities/ShippingMethod"
+            },
             "fields": [
               {
                 "name": "id"
@@ -1317,7 +1326,8 @@
             "dataType": "object"
           },
           {
-            "name": "lineItem",
+            "name": "items",
+            "array": true,
             "exampleData": [
               "Object",
               "Object",
@@ -1329,7 +1339,8 @@
             "dataType": "object"
           },
           {
-            "name": "shippingMethod",
+            "name": "shippingMethods",
+            "array": true,
             "exampleData": [
               "Object",
               "Object",
@@ -1341,7 +1352,8 @@
             "dataType": "object"
           },
           {
-            "name": "creditLine",
+            "name": "creditLines",
+            "array": true,
             "exampleData": [
               "Object",
               "Object",
@@ -1362,39 +1374,12 @@
             "dataType": "string"
           },
           {
-            "name": "lineItemAdjustments",
-            "array": true,
-            "exampleData": [],
-            "relatedEntity": {
-              "$ref": "#/schemas/valueObjects/LineItemAdjustment"
-            },
-            "dataType": "object"
-          },
-          {
-            "name": "lineItemTaxLines",
-            "array": true,
-            "exampleData": [],
-            "relatedEntity": {
-              "$ref": "#/schemas/valueObjects/LineItemTaxLine"
-            },
-            "dataType": "object"
-          },
-          {
-            "name": "shippingMethodAdjustments",
-            "array": true,
-            "exampleData": [],
-            "relatedEntity": {
-              "$ref": "#/schemas/valueObjects/ShippingMethodAdjustment"
-            },
-            "dataType": "object"
-          },
-          {
-            "name": "shippingMethodTaxLines",
-            "array": true,
-            "exampleData": [],
-            "relatedEntity": {
-              "$ref": "#/schemas/valueObjects/ShippingMethodTaxLine"
-            },
+            "name": "metadata",
+            "exampleData": [
+              "{}",
+              "{\"source\":\"web\"}",
+              "{\"campaign\":\"summer\"}"
+            ],
             "dataType": "object"
           }
         ]
