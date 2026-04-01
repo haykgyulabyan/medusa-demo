@@ -1,4 +1,4 @@
-import { store } from "../store/store.js"
+import { store } from "../store/store"
 
 export const getCartCreditOptions = async (cartId: string) => {
   const cart = await store.carts.get(cartId)

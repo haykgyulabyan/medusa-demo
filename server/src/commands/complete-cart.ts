@@ -1,6 +1,6 @@
-import type { Cart } from "../domain/types.js"
-import { store } from "../store/store.js"
-import { eventBus, DomainEvents } from "../events/event-bus.js"
+import type { Cart } from "../domain/types"
+import { store } from "../store/store"
+import { eventBus, DomainEvents } from "../events/event-bus"
 
 type CompleteCartInput = {
   id: string

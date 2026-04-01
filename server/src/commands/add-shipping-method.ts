@@ -1,7 +1,7 @@
-import type { Cart, ShippingMethod } from "../domain/types.js"
-import { store } from "../store/store.js"
-import { eventBus, DomainEvents } from "../events/event-bus.js"
-import { recalculateCartPricing } from "./recalculate-cart-pricing.js"
+import type { Cart, ShippingMethod } from "../domain/types"
+import { store } from "../store/store"
+import { eventBus, DomainEvents } from "../events/event-bus"
+import { recalculateCartPricing } from "./recalculate-cart-pricing"
 
 type AddShippingMethodInput = {
   id: string

@@ -1,5 +1,5 @@
-import type { Cart, Product, ShippingOption, PromoCode, TaxRate, Region } from "../domain/types.js"
-import { supabase } from "./supabase-client.js"
+import type { Cart, Product, ShippingOption, PromoCode, TaxRate, Region } from "../domain/types"
+import { supabase } from "./supabase-client"
 
 export const store = {
   carts: {

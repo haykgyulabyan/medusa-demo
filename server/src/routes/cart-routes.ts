@@ -10,14 +10,14 @@ import {
   addCreditLine,
   removeCreditLine,
   completeCart,
-} from "../commands/index.js"
+} from "../commands/index"
 import {
   getCartDetails,
   getCartShippingOptions,
   getCartCreditOptions,
   getCheckoutSummary,
-} from "../queries/index.js"
-import { store } from "../store/store.js"
+} from "../queries/index"
+import { store } from "../store/store"
 
 export const cartRouter = Router()
 

@@ -1,5 +1,5 @@
-import { store } from "../store/store.js"
-import type { Cart } from "../domain/types.js"
+import { store } from "../store/store"
+import type { Cart } from "../domain/types"
 
 export const getCartDetails = async (cartId: string): Promise<Cart> => {
   const cart = await store.carts.get(cartId)

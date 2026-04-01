@@ -1,4 +1,4 @@
-import { store } from "../store/store.js"
+import { store } from "../store/store"
 
 export const getCartCreationContext = async () => {
   const regions = await store.regions.getAll()

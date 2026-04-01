@@ -1,11 +1,11 @@
-import { store } from "../store/store.js"
-import { eventBus, DomainEvents } from "../events/event-bus.js"
+import { store } from "../store/store"
+import { eventBus, DomainEvents } from "../events/event-bus"
 import type {
   LineItemAdjustment,
   LineItemTaxLine,
   ShippingMethodAdjustment,
   ShippingMethodTaxLine,
-} from "../domain/types.js"
+} from "../domain/types"
 
 export const recalculateCartPricing = async (cartId: string): Promise<void> => {
   const cart = await store.carts.get(cartId)
