@@ -144,6 +144,7 @@ export type TaxRate = {
   code: string
   rate: number
   description: string
+  appliesTo: "all" | "physical" | "digital"
 }
 
 export type Region = {

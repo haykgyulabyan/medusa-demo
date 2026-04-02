@@ -113,7 +113,9 @@ const store = {
   taxRates: {
     async getAll() {
       const { data } = await supabase.from("tax_rates").select("*")
-      return data ?? []
+      return (data ?? []).map((tr: any) => ({
+        code: tr.code, rate: Number(tr.rate), description: tr.description, appliesTo: tr.applies_to,
+      }))
     },
   },
   regions: {
@@ -161,7 +163,8 @@ const recalculateCartPricing = async (cartId: string) => {
       }
     }
     item.adjustments = adjustments
-    item.taxLines = taxRates.map((tr: any) => ({ id: crypto.randomUUID(), code: tr.code, rate: Number(tr.rate), description: tr.description, taxRateId: tr.code }))
+    const applicableTaxRates = taxRates.filter((tr: any) => tr.appliesTo === "all" || (tr.appliesTo === "physical" && item.requiresShipping) || (tr.appliesTo === "digital" && !item.requiresShipping))
+    item.taxLines = applicableTaxRates.map((tr: any) => ({ id: crypto.randomUUID(), code: tr.code, rate: Number(tr.rate), description: tr.description, taxRateId: tr.code }))
     item.subtotal = item.unitPrice * item.quantity
     item.discountTotal = Math.min(item.adjustments.reduce((s, a) => s + a.amount, 0), item.subtotal)
     item.taxTotal = Math.round((item.subtotal - item.discountTotal) * item.taxLines.reduce((s, tl) => s + tl.rate, 0))
@@ -170,7 +173,8 @@ const recalculateCartPricing = async (cartId: string) => {
 
   for (const method of cart.shippingMethods) {
     method.adjustments = hasFreeShipping ? [{ id: crypto.randomUUID(), amount: method.amount, code: "FREESHIP", description: "Free shipping", promotionId: "FREESHIP" }] : []
-    method.taxLines = taxRates.map((tr: any) => ({ id: crypto.randomUUID(), code: tr.code, rate: Number(tr.rate), description: tr.description, taxRateId: tr.code }))
+    const shippingTaxRates = taxRates.filter((tr: any) => tr.appliesTo === "all")
+    method.taxLines = shippingTaxRates.map((tr: any) => ({ id: crypto.randomUUID(), code: tr.code, rate: Number(tr.rate), description: tr.description, taxRateId: tr.code }))
     method.discountTotal = Math.min(method.adjustments.reduce((s, a) => s + a.amount, 0), method.amount)
     method.taxTotal = Math.round((method.amount - method.discountTotal) * method.taxLines.reduce((s, tl) => s + tl.rate, 0))
     method.total = method.amount - method.discountTotal + method.taxTotal

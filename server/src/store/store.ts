@@ -76,7 +76,12 @@ export const store = {
   taxRates: {
     async getAll(): Promise<TaxRate[]> {
       const { data } = await supabase.from("tax_rates").select("*")
-      return (data ?? []) as TaxRate[]
+      return (data ?? []).map((tr) => ({
+        code: tr.code,
+        rate: Number(tr.rate),
+        description: tr.description,
+        appliesTo: tr.applies_to,
+      }))
     },
   },
 

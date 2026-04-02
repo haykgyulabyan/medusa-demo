@@ -51,14 +51,19 @@ export const recalculateCartPricing = async (cartId: string): Promise<void> => {
     }
     item.adjustments = adjustments
 
-    const itemTaxLines: LineItemTaxLine[] = taxRates.map((tr) => ({
+    // Filter tax rates: "all" applies to everything, "physical" to shippable, "digital" to non-shippable
+    const applicableTaxRates = taxRates.filter((tr) =>
+      tr.appliesTo === "all" ||
+      (tr.appliesTo === "physical" && item.requiresShipping) ||
+      (tr.appliesTo === "digital" && !item.requiresShipping)
+    )
+    item.taxLines = applicableTaxRates.map((tr) => ({
       id: crypto.randomUUID(),
       code: tr.code,
       rate: tr.rate,
       description: tr.description,
       taxRateId: tr.code,
     }))
-    item.taxLines = itemTaxLines
 
     item.subtotal = item.unitPrice * item.quantity
     item.discountTotal = item.adjustments.reduce((sum, a) => sum + a.amount, 0)
@@ -83,14 +88,15 @@ export const recalculateCartPricing = async (cartId: string): Promise<void> => {
     }
     method.adjustments = smAdjustments
 
-    const smTaxLines: ShippingMethodTaxLine[] = taxRates.map((tr) => ({
+    // Shipping only gets "all" tax rates (e.g. VAT, not eco/digital taxes)
+    const shippingTaxRates = taxRates.filter((tr) => tr.appliesTo === "all")
+    method.taxLines = shippingTaxRates.map((tr) => ({
       id: crypto.randomUUID(),
       code: tr.code,
       rate: tr.rate,
       description: tr.description,
       taxRateId: tr.code,
     }))
-    method.taxLines = smTaxLines
 
     method.discountTotal = method.adjustments.reduce((sum, a) => sum + a.amount, 0)
     method.discountTotal = Math.min(method.discountTotal, method.amount)
