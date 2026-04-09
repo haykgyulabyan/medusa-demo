@@ -28,6 +28,12 @@ This project implements a complete cart/checkout bounded context following Domai
 git clone https://github.com/haykgyulabyan/medusa-demo.git
 cd medusa-demo
 
+# Set up server env vars (data lives in Supabase)
+# Option A — pull from the linked Vercel project (requires team access):
+vercel env pull server/.env
+# Option B — copy the template and fill in SUPABASE_URL + SUPABASE_ANON_KEY:
+cp server/.env.example server/.env
+
 # Start the server (port 3001)
 cd server
 npm install
@@ -49,9 +55,8 @@ server/src/
 ├── commands/     # State mutations (11 command handlers)
 ├── queries/      # Read-only projections (5 query handlers)
 ├── events/       # Domain event bus
-├── store/        # In-memory data store
-├── routes/       # Express REST API
-└── seed/         # Mock data (products, shipping, promos, tax)
+├── store/        # Supabase-backed data store
+└── routes/       # Express REST API
 
 client/src/
 ├── pages/        # Catalog → Cart → Shipping → Checkout → Confirmation

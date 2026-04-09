@@ -7,10 +7,11 @@ entities, value objects, commands, queries, domain events, and acceptance criter
 
 ## Tech Stack
 - **Runtime:** Node.js + TypeScript
-- **Backend:** Express, in-memory store (no database)
+- **Backend:** Express, Supabase (Postgres) for persistence
 - **Frontend:** React + Vite + TailwindCSS
 - **Monorepo:** Single repo, two packages: `server/` and `client/`
-- **No external dependencies** for data — everything runs locally with mock data
+- **Deployment:** Vercel — `api/index.ts` is a self-contained serverless handler that mirrors `server/src` (kept self-contained because Vercel's build couldn't resolve cross-directory imports)
+- **Local dev requires** `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `server/.env` (see `server/.env.example`). Easiest way to populate: `vercel env pull server/.env` from the repo root.
 
 ## Project Structure
 server/                                                                                                                                                                                                          
@@ -19,10 +20,9 @@ server/
 │   ├── commands/        # Command handlers (from domain-model.json commands)                                                                                                                                    
 │   ├── queries/         # Query handlers (from domain-model.json queries)                                                                                                                                       
 │   ├── events/          # Domain event definitions and simple event bus                                                                                                                                         
-│   ├── store/           # In-memory data store                                                                                                                                                                  
-│   ├── routes/          # Express routes mapping to commands/queries                                                                                                                                            
-│   ├── seed/            # Mock data seeding                                                                                                                                                                     
-│   └── index.ts         # Express app entry point                                                                                                                                                               
+│   ├── store/           # Supabase-backed data store
+│   ├── routes/          # Express routes mapping to commands/queries
+│   └── index.ts         # Express app entry point (loads dotenv before app)                                                                                                                                                               
 client/                                                                                                                                                                                                          
 ├── src/                                                                                                                                                                                                         
 │   ├── pages/           # Cart flow pages                                                                                                                                                                       
@@ -73,9 +73,9 @@ cart.tax_total = sum(items[].tax_total) + sum(shippingMethods[].tax_total)
 cart.credit_line_total = sum(creditLines[].amount)                                                                                                                                                               
 cart.total = cart.item_total + cart.shipping_total - cart.credit_line_total
 
-## Mock Data Seed
+## Reference Data
 
-Seed the following on server start:
+The following lives in Supabase tables (`products`, `shipping_options`, `promo_codes`, `tax_rates`, `regions`) — not seeded by the server at startup:
 
 **Products (5):**                                                                                                                                                                                                
 | id | title | variant_id | unit_price | requires_shipping |
