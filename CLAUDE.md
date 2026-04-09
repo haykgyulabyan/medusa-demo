@@ -7,11 +7,13 @@ entities, value objects, commands, queries, domain events, and acceptance criter
 
 ## Tech Stack
 - **Runtime:** Node.js + TypeScript
-- **Backend:** Express, Supabase (Postgres) for persistence
+- **Backend:** Express. Two storage backends behind a single `Store` interface:
+  - **SQLite** (`better-sqlite3`) — local default. File at `server/data/cart.db`, gitignored, auto-created and seeded on first startup from `server/src/store/seed-data.ts`.
+  - **Supabase Postgres** — used in production on Vercel and locally if you drop a `server/.env` with `SUPABASE_URL` set (e.g. via `vercel env pull server/.env`).
+- The selector is in `server/src/store/store.ts`: `process.env.SUPABASE_URL ? createSupabaseStore() : createSqliteStore()`. Local clones get SQLite by default with zero configuration.
 - **Frontend:** React + Vite + TailwindCSS
 - **Monorepo:** Single repo, two packages: `server/` and `client/`
-- **Deployment:** Vercel — `api/index.ts` is a self-contained serverless handler that mirrors `server/src` (kept self-contained because Vercel's build couldn't resolve cross-directory imports)
-- **Local dev requires** `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `server/.env` (see `server/.env.example`). Easiest way to populate: `vercel env pull server/.env` from the repo root.
+- **Deployment:** Vercel — `api/index.ts` is a self-contained serverless handler that mirrors `server/src` (kept self-contained because Vercel's build couldn't resolve cross-directory imports). It is hardcoded to Supabase and does **not** use the store selector. Any change to the storage interface needs to be mirrored there manually.
 
 ## Project Structure
 server/                                                                                                                                                                                                          
@@ -20,7 +22,7 @@ server/
 │   ├── commands/        # Command handlers (from domain-model.json commands)                                                                                                                                    
 │   ├── queries/         # Query handlers (from domain-model.json queries)                                                                                                                                       
 │   ├── events/          # Domain event definitions and simple event bus                                                                                                                                         
-│   ├── store/           # Supabase-backed data store
+│   ├── store/           # Store interface + SQLite (default) and Supabase implementations + seed-data.ts
 │   ├── routes/          # Express routes mapping to commands/queries
 │   └── index.ts         # Express app entry point (loads dotenv before app)                                                                                                                                                               
 client/                                                                                                                                                                                                          

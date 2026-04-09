@@ -28,12 +28,6 @@ This project implements a complete cart/checkout bounded context following Domai
 git clone https://github.com/haykgyulabyan/medusa-demo.git
 cd medusa-demo
 
-# Set up server env vars (data lives in Supabase)
-# Option A — pull from the linked Vercel project (requires team access):
-vercel env pull server/.env
-# Option B — copy the template and fill in SUPABASE_URL + SUPABASE_ANON_KEY:
-cp server/.env.example server/.env
-
 # Start the server (port 3001)
 cd server
 npm install
@@ -45,7 +39,13 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) to see the app.
+Open [http://localhost:5173](http://localhost:5173) to see the app. No database setup, no env vars, nothing to configure.
+
+### How persistence works
+
+Locally, the server writes to a SQLite file at `server/data/cart.db`, created automatically on first run and seeded with the same products, shipping options, promo codes, and tax rates as the deployed demo. The file is gitignored and isolated to your machine — feel free to delete it any time to reset (`rm server/data/cart.db`).
+
+The deployed demo on Vercel uses **Supabase Postgres** instead of SQLite for persistence. That switch is invisible to the rest of the codebase: the store layer (`server/src/store/`) exposes a single interface that's implemented twice — once for SQLite and once for Supabase — and the implementation is picked at startup based on whether `SUPABASE_URL` is set in the environment. Local clones never see Supabase.
 
 ## Architecture
 
@@ -55,7 +55,7 @@ server/src/
 ├── commands/     # State mutations (11 command handlers)
 ├── queries/      # Read-only projections (5 query handlers)
 ├── events/       # Domain event bus
-├── store/        # Supabase-backed data store
+├── store/        # Storage interface + SQLite (local) and Supabase (prod) implementations
 └── routes/       # Express REST API
 
 client/src/
